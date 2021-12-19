@@ -17,7 +17,7 @@
 		},
 		"Ls_AzureDatabricks_01_properties_typeProperties_workspaceResourceId": {
 			"type": "string",
-			"defaultValue": "/subscriptions/c20af4c3-6b7a-4ee8-b830-a2a69c4a56ac/resourceGroups/mdwdops-16-dev-rg/providers/Microsoft.Databricks/workspaces/mdwdops-dbw-dev-16"
+			"defaultValue": "/subscriptions/c1474094-753e-4c8d-ab86-334339bef4aa/resourceGroups/mdwdops-onns2-dev-rg/providers/Microsoft.Databricks/workspaces/mdwdops-dbw-dev-onns2"
 		},
 		"Ls_KeyVault_01_properties_typeProperties_baseUrl": {
 			"type": "string",
@@ -89,7 +89,7 @@
 					"newClusterSparkEnvVars": {
 						"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
 					},
-					"newClusterVersion": "7.3.x-scala2.12",
+					"newClusterVersion": "10.0.x-scala2.12",
 					"newClusterInitScripts": []
 				}
 			},
