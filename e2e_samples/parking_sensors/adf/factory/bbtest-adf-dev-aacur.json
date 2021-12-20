@@ -1,0 +1,9 @@
+{
+	"name": "bbtest-adf-dev-aacur",
+	"location": "westus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "6e57715b-932f-4e4b-99ec-c2e5422cabf5",
+		"tenantId": "1f2558d0-4970-49d9-aa83-062e05332405"
+	}
+}
