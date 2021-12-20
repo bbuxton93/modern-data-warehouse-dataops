@@ -19,7 +19,7 @@ fi
 DEPLOYMENT_ID=${DEPLOYMENT_ID:-}
 if [ -z "$DEPLOYMENT_ID" ]
 then 
-    export DEPLOYMENT_ID="$(random_str 5)"
+    export DEPLOYMENT_ID="aacur"
     echo "No deployment id [DEPLOYMENT_ID] specified, defaulting to $DEPLOYMENT_ID"
 fi
 
@@ -44,8 +44,8 @@ then
     echo "No branch name in [AZDO_PIPELINES_BRANCH_NAME] specified. defaulting to $AZDO_PIPELINES_BRANCH_NAME."
 fi
 
-AZURESQL_SERVER_PASSWORD=${AZURESQL_SERVER_PASSWORD:-}
-if [ -z "$AZURESQL_SERVER_PASSWORD" ]
-then 
-    export AZURESQL_SERVER_PASSWORD="$(makepasswd --chars 16)"
-fi
+# AZURESQL_SERVER_PASSWORD=${AZURESQL_SERVER_PASSWORD:-}
+# if [ -z "$AZURESQL_SERVER_PASSWORD" ]
+# then 
+#     export AZURESQL_SERVER_PASSWORD="$(makepasswd --chars 16)"
+# fi

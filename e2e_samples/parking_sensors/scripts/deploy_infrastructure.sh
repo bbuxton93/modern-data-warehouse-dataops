@@ -63,18 +63,18 @@ arm_output=$(az deployment group validate \
     --resource-group "$resource_group_name" \
     --template-file "./infrastructure/main.bicep" \
     --parameters @"./infrastructure/main.parameters.${ENV_NAME}.json" \
-    --parameters project="${PROJECT}" keyvault_owner_object_id="${kv_owner_object_id}" deployment_id="${DEPLOYMENT_ID}" sql_server_password="${AZURESQL_SERVER_PASSWORD}" \
+    --parameters project="${PROJECT}" keyvault_owner_object_id="${kv_owner_object_id}" deployment_id="${DEPLOYMENT_ID}"  \
     --output json)
-
+# sql_server_password="${AZURESQL_SERVER_PASSWORD}"
 # Deploy arm template
 echo "Deploying resources into $resource_group_name"
 arm_output=$(az deployment group create \
     --resource-group "$resource_group_name" \
     --template-file "./infrastructure/main.bicep" \
     --parameters @"./infrastructure/main.parameters.${ENV_NAME}.json" \
-    --parameters project="${PROJECT}" deployment_id="${DEPLOYMENT_ID}" keyvault_owner_object_id="${kv_owner_object_id}" sql_server_password="${AZURESQL_SERVER_PASSWORD}" \
+    --parameters project="${PROJECT}" deployment_id="${DEPLOYMENT_ID}" keyvault_owner_object_id="${kv_owner_object_id}"  \
     --output json)
-
+# sql_server_password="${AZURESQL_SERVER_PASSWORD}"
 if [[ -z $arm_output ]]; then
     echo >&2 "ARM deployment failed."
     exit 1
@@ -133,41 +133,41 @@ az keyvault secret set --vault-name "$kv_name" --name "datalakeurl" --value "htt
 ###################
 # SQL
 
-echo "Retrieving SQL Server information from the deployment."
-# Retrieve SQL creds
-sql_server_name=$(echo "$arm_output" | jq -r '.properties.outputs.synapse_sql_pool_output.value.name')
-sql_server_username=$(echo "$arm_output" | jq -r '.properties.outputs.synapse_sql_pool_output.value.username')
-sql_server_password=$(echo "$arm_output" | jq -r '.properties.outputs.synapse_sql_pool_output.value.password')
-sql_dw_database_name=$(echo "$arm_output" | jq -r '.properties.outputs.synapse_sql_pool_output.value.synapse_pool_name')
+# echo "Retrieving SQL Server information from the deployment."
+# # Retrieve SQL creds
+# sql_server_name=$(echo "$arm_output" | jq -r '.properties.outputs.synapse_sql_pool_output.value.name')
+# sql_server_username=$(echo "$arm_output" | jq -r '.properties.outputs.synapse_sql_pool_output.value.username')
+# sql_server_password=$(echo "$arm_output" | jq -r '.properties.outputs.synapse_sql_pool_output.value.password')
+# sql_dw_database_name=$(echo "$arm_output" | jq -r '.properties.outputs.synapse_sql_pool_output.value.synapse_pool_name')
 
-# SQL Connection String
-sql_dw_connstr_nocred=$(az sql db show-connection-string --client ado.net \
-    --name "$sql_dw_database_name" --server "$sql_server_name" --output json |
-    jq -r .)
-sql_dw_connstr_uname=${sql_dw_connstr_nocred/<username>/$sql_server_username}
-sql_dw_connstr_uname_pass=${sql_dw_connstr_uname/<password>/$sql_server_password}
+# # SQL Connection String
+# sql_dw_connstr_nocred=$(az sql db show-connection-string --client ado.net \
+#     --name "$sql_dw_database_name" --server "$sql_server_name" --output json |
+#     jq -r .)
+# sql_dw_connstr_uname=${sql_dw_connstr_nocred/<username>/$sql_server_username}
+# sql_dw_connstr_uname_pass=${sql_dw_connstr_uname/<password>/$sql_server_password}
 
-# Store in Keyvault
-az keyvault secret set --vault-name "$kv_name" --name "sqlsrvrName" --value "$sql_server_name"
-az keyvault secret set --vault-name "$kv_name" --name "sqlsrvUsername" --value "$sql_server_username"
-az keyvault secret set --vault-name "$kv_name" --name "sqlsrvrPassword" --value "$sql_server_password"
-az keyvault secret set --vault-name "$kv_name" --name "sqldwDatabaseName" --value "$sql_dw_database_name"
-az keyvault secret set --vault-name "$kv_name" --name "sqldwConnectionString" --value "$sql_dw_connstr_uname_pass"
+# # Store in Keyvault
+# az keyvault secret set --vault-name "$kv_name" --name "sqlsrvrName" --value "$sql_server_name"
+# az keyvault secret set --vault-name "$kv_name" --name "sqlsrvUsername" --value "$sql_server_username"
+# az keyvault secret set --vault-name "$kv_name" --name "sqlsrvrPassword" --value "$sql_server_password"
+# az keyvault secret set --vault-name "$kv_name" --name "sqldwDatabaseName" --value "$sql_dw_database_name"
+# az keyvault secret set --vault-name "$kv_name" --name "sqldwConnectionString" --value "$sql_dw_connstr_uname_pass"
 
 
 ####################
 # APPLICATION INSIGHTS
 
-echo "Retrieving ApplicationInsights information from the deployment."
-appinsights_name=$(echo "$arm_output" | jq -r '.properties.outputs.appinsights_name.value')
-appinsights_key=$(az monitor app-insights component show \
-    --app "$appinsights_name" \
-    --resource-group "$resource_group_name" \
-    --output json |
-    jq -r '.instrumentationKey')
+# echo "Retrieving ApplicationInsights information from the deployment."
+# appinsights_name=$(echo "$arm_output" | jq -r '.properties.outputs.appinsights_name.value')
+# appinsights_key=$(az monitor app-insights component show \
+#     --app "$appinsights_name" \
+#     --resource-group "$resource_group_name" \
+#     --output json |
+#     jq -r '.instrumentationKey')
 
-# Store in Keyvault
-az keyvault secret set --vault-name "$kv_name" --name "applicationInsightsKey" --value "$appinsights_key"
+# # Store in Keyvault
+# az keyvault secret set --vault-name "$kv_name" --name "applicationInsightsKey" --value "$appinsights_key"
 
 # ###########################
 # # RETRIEVE DATABRICKS INFORMATION AND CONFIGURE WORKSPACE
@@ -272,6 +272,11 @@ DEPLOYMENT_ID=$DEPLOYMENT_ID \
     bash -c "./scripts/deploy_azdo_service_connections_azure.sh"
 
 # AzDO Variable Groups
+# SQL_SERVER_NAME=$sql_server_name \
+# SQL_SERVER_USERNAME=$sql_server_username \
+# SQL_SERVER_PASSWORD=$sql_server_password \
+# SQL_DW_DATABASE_NAME=$sql_dw_database_name \
+
 PROJECT=$PROJECT \
 ENV_NAME=$ENV_NAME \
 AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID \
@@ -281,10 +286,6 @@ KV_URL=$kv_dns_name \
 DATABRICKS_TOKEN=$databricks_token \
 DATABRICKS_HOST=$databricks_host \
 DATABRICKS_WORKSPACE_RESOURCE_ID=$databricks_workspace_resource_id \
-SQL_SERVER_NAME=$sql_server_name \
-SQL_SERVER_USERNAME=$sql_server_username \
-SQL_SERVER_PASSWORD=$sql_server_password \
-SQL_DW_DATABASE_NAME=$sql_dw_database_name \
 AZURE_STORAGE_KEY=$azure_storage_key \
 AZURE_STORAGE_ACCOUNT=$azure_storage_account \
 DATAFACTORY_NAME=$datafactory_name \
@@ -296,7 +297,11 @@ SP_ADF_TENANT=$sp_adf_tenant \
 
 ####################
 # BUILD ENV FILE FROM CONFIG INFORMATION
-
+# SQL_SERVER_NAME=${sql_server_name}
+# SQL_SERVER_USERNAME=${sql_server_username}
+# SQL_SERVER_PASSWORD=${sql_server_password}
+# SQL_DW_DATABASE_NAME=${sql_dw_database_name}
+#APPINSIGHTS_KEY=${appinsights_key}
 env_file=".env.${ENV_NAME}"
 echo "Appending configuration to .env file."
 cat << EOF >> "$env_file"
@@ -304,10 +309,6 @@ cat << EOF >> "$env_file"
 # ------ Configuration from deployment on ${TIMESTAMP} -----------
 RESOURCE_GROUP_NAME=${resource_group_name}
 AZURE_LOCATION=${AZURE_LOCATION}
-SQL_SERVER_NAME=${sql_server_name}
-SQL_SERVER_USERNAME=${sql_server_username}
-SQL_SERVER_PASSWORD=${sql_server_password}
-SQL_DW_DATABASE_NAME=${sql_dw_database_name}
 AZURE_STORAGE_ACCOUNT=${azure_storage_account}
 AZURE_STORAGE_KEY=${azure_storage_key}
 SP_STOR_NAME=${sp_stor_name}
@@ -317,7 +318,7 @@ SP_STOR_TENANT=${sp_stor_tenant}
 DATABRICKS_HOST=${databricks_host}
 DATABRICKS_TOKEN=${databricks_token}
 DATAFACTORY_NAME=${datafactory_name}
-APPINSIGHTS_KEY=${appinsights_key}
+
 KV_URL=${kv_dns_name}
 
 EOF

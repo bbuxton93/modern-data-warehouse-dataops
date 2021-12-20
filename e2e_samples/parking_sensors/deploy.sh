@@ -19,27 +19,27 @@
 set -o errexit
 set -o pipefail
 set -o nounset
-# set -o xtrace # For debugging
+set -o xtrace # For debugging
 
 . ./scripts/common.sh
 . ./scripts/verify_prerequisites.sh
 . ./scripts/init_environment.sh
 
 
-project=mdwdops # CONSTANT - this is prefixes to all resources of the Parking Sensor sample
+project="bbtest" # CONSTANT - this is prefixes to all resources of the Parking Sensor sample
 github_repo_url="https://github.com/$GITHUB_REPO"
 
 
 ###################
 # DEPLOY ALL FOR EACH ENVIRONMENT
-
-for env_name in dev stg prod; do  # dev stg prod
+# dev stg prod
+# AZURESQL_SERVER_PASSWORD=$AZURESQL_SERVER_PASSWORD \
+for env_name in dev stg; do  
     PROJECT=$project \
     DEPLOYMENT_ID=$DEPLOYMENT_ID \
     ENV_NAME=$env_name \
     AZURE_LOCATION=$AZURE_LOCATION \
     AZURE_SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID \
-    AZURESQL_SERVER_PASSWORD=$AZURESQL_SERVER_PASSWORD \
     bash -c "./scripts/deploy_infrastructure.sh"  # inclues AzDevOps Azure Service Connections and Variable Groups
 done
 
