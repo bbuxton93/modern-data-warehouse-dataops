@@ -32,7 +32,7 @@ github_repo_url="https://github.com/$GITHUB_REPO"
 
 ###################
 # DEPLOY ALL FOR EACH ENVIRONMENT
-# dev stg prod
+# dev stg prod ADDING FOR TEST
 # AZURESQL_SERVER_PASSWORD=$AZURESQL_SERVER_PASSWORD \
 for env_name in dev stg; do  
     PROJECT=$project \
