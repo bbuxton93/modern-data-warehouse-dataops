@@ -5,14 +5,14 @@ pr: none
 resources:
   pipelines:
   - pipeline: ciartifacts
-    source: mdwdops-ci-artifacts
+    source: bbtest-ci-artifacts
     trigger: 
       branches:
       - main
   repositories:
   - repository: mdwdataops_adfpublish
     type: github
-    endpoint: mdwdops-github
+    endpoint: bbtest-github
     name: bbuxton93/modern-data-warehouse-dataops
     ref: adf_publish
 
